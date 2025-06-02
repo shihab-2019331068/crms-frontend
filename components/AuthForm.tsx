@@ -1,6 +1,7 @@
 // AuthForm.tsx - shared form logic for login/register (to be implemented)
 import React, { useState } from "react";
 import Link from "next/link";
+import { isValidEmail, isStrongPassword, isNonEmpty } from "@/utils/validators";
 
 interface LoginProps {
   type: "login";
@@ -25,6 +26,7 @@ type RegisterFormState = { name: string; email: string; password: string; confir
 export default function AuthForm(props: AuthFormProps) {
   const [loginForm, setLoginForm] = useState<LoginFormState>({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState<RegisterFormState>({ name: "", email: "", password: "", confirmPassword: "", role: "", department: "" });
+  // const [error, setError] = useState(""); // Removed local error state
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     if (props.type === "login") {
@@ -39,6 +41,17 @@ export default function AuthForm(props: AuthFormProps) {
     if (props.type === "login") {
       await props.onSubmit(loginForm);
     } else {
+      // Custom validation for super_admin: department not required
+      if (
+        !isNonEmpty(registerForm.name) ||
+        !isNonEmpty(registerForm.email) ||
+        !isNonEmpty(registerForm.password) ||
+        !isNonEmpty(registerForm.confirmPassword) ||
+        !isNonEmpty(registerForm.role) ||
+        (registerForm.role !== "super_admin" && !isNonEmpty(registerForm.department))
+      ) {
+        return;
+      }
       await props.onSubmit(registerForm);
     }
   }
@@ -57,11 +70,12 @@ export default function AuthForm(props: AuthFormProps) {
           <input name="confirmPassword" type="password" placeholder="Confirm Password" value={registerForm.confirmPassword} onChange={handleChange} className="input input-bordered w-full bg-[#18181b] border-[#27272a] text-foreground placeholder:text-gray-400" required />
           <select name="role" value={registerForm.role} onChange={handleChange} className="input input-bordered w-full bg-[#18181b] border-[#27272a] text-foreground" required>
             <option value="">Select Role</option>
+            <option value="super_admin">Super Admin</option>
             <option value="student">Student</option>
             <option value="teacher">Teacher</option>
-            <option value="admin">Department Admin</option>
+            <option value="department_admin">Department Admin</option>
           </select>
-          <select name="department" value={registerForm.department} onChange={handleChange} className="input input-bordered w-full bg-[#18181b] border-[#27272a] text-foreground" required>
+          <select name="department" value={registerForm.department} onChange={handleChange} className="input input-bordered w-full bg-[#18181b] border-[#27272a] text-foreground" required={registerForm.role !== "super_admin"} disabled={registerForm.role === "super_admin"}>
             <option value="">Select Department</option>
             {props.type === "register" && props.departments.map((d) => (
               <option key={d.id} value={d.id}>{d.name}</option>

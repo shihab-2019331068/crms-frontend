@@ -28,7 +28,15 @@ export default function RegisterPage() {
 
   async function handleRegister(data: { name: string; email: string; password: string; confirmPassword: string; role: string; department: string }) {
     setError("");
-    if (!isNonEmpty(data.name) || !isNonEmpty(data.email) || !isNonEmpty(data.password) || !isNonEmpty(data.confirmPassword) || !isNonEmpty(data.role) || !isNonEmpty(data.department)) {
+    // Custom validation for super_admin: department not required
+    if (
+      !isNonEmpty(data.name) ||
+      !isNonEmpty(data.email) ||
+      !isNonEmpty(data.password) ||
+      !isNonEmpty(data.confirmPassword) ||
+      !isNonEmpty(data.role) ||
+      (data.role !== "super_admin" && !isNonEmpty(data.department))
+    ) {
       setError("All fields are required.");
       return;
     }
