@@ -30,13 +30,15 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      const res = await api.post("/auth/login", data);
+      const res = await api.post("/login", data);
       const { token, role, email } = res.data;
       login({ token, role, email });
+
+      console.log("Login successful:", res.data);
       if (role === "student") router.push("/dashboard/student");
       else if (role === "teacher") router.push("/dashboard/teacher");
-      else if (role === "admin") router.push("/dashboard/admin");
-      else if (role === "super admin") router.push("/dashboard/super-admin");
+      else if (role === "department_admin") router.push("/dashboard/department-admin");
+      else if (role === "super_admin") router.push("/dashboard/super-admin");
       else router.push("/");
     } catch (err) {
       const axiosErr = err as AxiosError;
