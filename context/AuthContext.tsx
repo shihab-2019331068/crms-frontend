@@ -7,12 +7,12 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 interface User {
   email: string;
   role: string;
-  token: string;
+  token?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;
+  login: (user: Omit<User, "token">) => void;
   logout: () => void;
 }
 
@@ -26,9 +26,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (stored) setUser(JSON.parse(stored));
   }, []);
 
-  const login = (user: User) => {
-    setUser(user);
-    localStorage.setItem("crms_user", JSON.stringify(user));
+  const login = (user: Omit<User, "token">) => {
+    setUser({ ...user, token: "" }); // token is not used anymore
+    localStorage.setItem("crms_user", JSON.stringify({ ...user, token: "" }));
   };
 
   const logout = () => {
@@ -48,3 +48,17 @@ export const useAuth = () => {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 };
+
+// Update AuthContextType and User type
+declare module "@/context/AuthContext" {
+  interface User {
+    email: string;
+    role: string;
+    token?: string;
+  }
+  interface AuthContextType {
+    user: User | null;
+    login: (user: Omit<User, "token">) => void;
+    logout: () => void;
+  }
+}

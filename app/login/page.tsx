@@ -30,11 +30,11 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      const res = await api.post("/login", data);
-      const { token, role, email } = res.data;
-      login({ token, role, email });
+      // Send credentials (cookies) with the request
+      const res = await api.post("/login", data, { withCredentials: true });
+      const { role, email } = res.data;
+      login({ role, email }); // Only pass role and email
 
-      console.log("Login successful:", res.data);
       if (role === "student") router.push("/dashboard/student");
       else if (role === "teacher") router.push("/dashboard/teacher");
       else if (role === "department_admin") router.push("/dashboard/department-admin");
