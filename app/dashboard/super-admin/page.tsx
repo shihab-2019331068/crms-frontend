@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "@/services/api";
 
 // Define types for Department and Room
@@ -31,6 +31,19 @@ export default function SuperAdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Fetch departments for dropdown on mount
+  useEffect(() => {
+    const fetchInitialDepartments = async () => {
+      try {
+        const res = await api.get<Department[]>("/dashboard/super-admin/departments", { withCredentials: true });
+        setDepartments(res.data);
+      } catch {
+        // ignore error here, handled elsewhere
+      }
+    };
+    fetchInitialDepartments();
+  }, []);
 
   const handleAddDepartment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +82,7 @@ export default function SuperAdminDashboard() {
           roomNumber,
           capacity: Number(roomCapacity),
           status: roomStatus,
-          departmentId: roomDeptId,
+          departmentId: Number(roomDeptId), // Ensure departmentId is sent as a number
         },
         { withCredentials: true }
       );
@@ -160,22 +173,31 @@ export default function SuperAdminDashboard() {
             className="input input-bordered w-full"
             required
           />
-          <input
-            type="text"
-            placeholder="Status (e.g. available, unavailable)"
-            value={roomStatus}
-            onChange={e => setRoomStatus(e.target.value)}
-            className="input input-bordered w-full"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Department ID"
+          {/* Room Status as Checkbox */}
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={roomStatus === "AVAILABLE"}
+              onChange={e => setRoomStatus(e.target.checked ? "AVAILABLE" : "UNAVAILABLE")}
+              className="checkbox"
+            />
+            <span>Available</span>
+          </label>
+          <select
             value={roomDeptId}
             onChange={e => setRoomDeptId(e.target.value)}
-            className="input input-bordered w-full"
+            className="input input-bordered w-full bg-gray-800 text-white"
             required
-          />
+          >
+            <option value="" disabled>
+              Select Department
+            </option>
+            {departments.map((dept) => (
+              <option key={dept.id} value={dept.id}>
+                {dept.name} (ID: {dept.id})
+              </option>
+            ))}
+          </select>
           <button type="submit" className="btn btn-outline btn-sm mt-2 cursor-pointer" disabled={loading}>
             {loading ? "Adding..." : "Add Room"}
           </button>
