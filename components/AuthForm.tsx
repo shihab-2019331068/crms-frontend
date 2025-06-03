@@ -1,7 +1,7 @@
 // AuthForm.tsx - shared form logic for login/register (to be implemented)
 import React, { useState } from "react";
 import Link from "next/link";
-import { isValidEmail, isStrongPassword, isNonEmpty } from "@/utils/validators";
+import { isNonEmpty } from "@/utils/validators";
 
 interface LoginProps {
   type: "login";

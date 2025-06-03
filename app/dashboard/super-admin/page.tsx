@@ -37,7 +37,7 @@ export default function SuperAdminDashboard() {
   useEffect(() => {
     const fetchInitialDepartments = async () => {
       try {
-        const res = await api.get<Department[]>("/dashboard/super-admin/departments", { withCredentials: true });
+        const res = await api.get<Department[]>("/departments", { withCredentials: true });
         setDepartments(res.data);
       } catch {
         // ignore error here, handled elsewhere
@@ -104,7 +104,7 @@ export default function SuperAdminDashboard() {
     setLoading(true);
     setError("");
     try {
-      const res = await api.get<Department[]>("/dashboard/super-admin/departments", { withCredentials: true });
+      const res = await api.get<Department[]>("/departments", { withCredentials: true });
       setDepartments(res.data);
       setShowDepartments(true);
       setShowRooms(false);
@@ -119,7 +119,7 @@ export default function SuperAdminDashboard() {
     setLoading(true);
     setError("");
     try {
-      const res = await api.get<Room[]>("/dashboard/super-admin/rooms", { withCredentials: true });
+      const res = await api.get<Room[]>("/rooms", { withCredentials: true });
       setRooms(res.data);
       setShowRooms(true);
       setShowDepartments(false);
