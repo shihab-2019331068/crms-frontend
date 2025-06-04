@@ -21,11 +21,11 @@ interface RegisterProps {
 type AuthFormProps = LoginProps | RegisterProps;
 
 type LoginFormState = { email: string; password: string };
-type RegisterFormState = { name: string; email: string; password: string; confirmPassword: string; role: string; department: string };
+type RegisterFormState = { name: string; email: string; password: string; confirmPassword: string; role: string; department: string; session: string };
 
 export default function AuthForm(props: AuthFormProps) {
   const [loginForm, setLoginForm] = useState<LoginFormState>({ email: "", password: "" });
-  const [registerForm, setRegisterForm] = useState<RegisterFormState>({ name: "", email: "", password: "", confirmPassword: "", role: "", department: "" });
+  const [registerForm, setRegisterForm] = useState<RegisterFormState>({ name: "", email: "", password: "", confirmPassword: "", role: "", department: "", session: "" });
   // const [error, setError] = useState(""); // Removed local error state
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -41,14 +41,15 @@ export default function AuthForm(props: AuthFormProps) {
     if (props.type === "login") {
       await props.onSubmit(loginForm);
     } else {
-      // Custom validation for super_admin: department not required
+      // Custom validation for super_admin: department not required, session required for student
       if (
         !isNonEmpty(registerForm.name) ||
         !isNonEmpty(registerForm.email) ||
         !isNonEmpty(registerForm.password) ||
         !isNonEmpty(registerForm.confirmPassword) ||
         !isNonEmpty(registerForm.role) ||
-        (registerForm.role !== "super_admin" && !isNonEmpty(registerForm.department))
+        (registerForm.role !== "super_admin" && !isNonEmpty(registerForm.department)) ||
+        (registerForm.role === "student" && !isNonEmpty(registerForm.session))
       ) {
         return;
       }
@@ -81,6 +82,9 @@ export default function AuthForm(props: AuthFormProps) {
               <option key={d.id} value={d.id}>{d.name}</option>
             ))}
           </select>
+          {registerForm.role === "student" && (
+            <input name="session" type="text" placeholder="Session (e.g. 2019-2020)" value={registerForm.session} onChange={handleChange} className="input input-bordered w-full bg-[#18181b] border-[#27272a] text-foreground placeholder:text-gray-400" required />
+          )}
         </>
       )}
       {props.error && <div className="text-red-400 text-sm">{props.error}</div>}

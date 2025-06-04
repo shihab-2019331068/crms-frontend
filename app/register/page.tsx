@@ -26,16 +26,17 @@ export default function RegisterPage() {
     api.get("/departments").then((res: { data: Department[] }) => setDepartments(res.data)).catch(() => setDepartments([]));
   }, []);
 
-  async function handleRegister(data: { name: string; email: string; password: string; confirmPassword: string; role: string; department: string }) {
+  async function handleRegister(data: { name: string; email: string; password: string; confirmPassword: string; role: string; department: string; session?: string }) {
     setError("");
-    // Custom validation for super_admin: department not required
+    // Custom validation for super_admin: department not required, session required for student
     if (
       !isNonEmpty(data.name) ||
       !isNonEmpty(data.email) ||
       !isNonEmpty(data.password) ||
       !isNonEmpty(data.confirmPassword) ||
       !isNonEmpty(data.role) ||
-      (data.role !== "super_admin" && !isNonEmpty(data.department))
+      (data.role !== "super_admin" && !isNonEmpty(data.department)) ||
+      (data.role === "student" && !isNonEmpty(data.session ?? ''))
     ) {
       setError("All fields are required.");
       return;

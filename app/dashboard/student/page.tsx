@@ -67,7 +67,8 @@ export default function StudentDashboard() {
     setCourses([]);
     try {
       const res = await api.get("/dashboard/student/courses", { withCredentials: true });
-      const data = Array.isArray(res.data) ? res.data : [];
+
+      const data = Array.isArray(res.data.courses) ? res.data.courses : [];
       setCourses(data);
       setActiveView("courses");
     } catch {
